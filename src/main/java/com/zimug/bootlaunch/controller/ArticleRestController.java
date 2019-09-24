@@ -2,19 +2,22 @@ package com.zimug.bootlaunch.controller;
 
 import com.zimug.bootlaunch.model.AjaxResponse;
 import com.zimug.bootlaunch.model.Article;
-import io.swagger.annotations.*;
-import lombok.Data;
+import com.zimug.bootlaunch.service.impl.ArticleRestJDBCServiceImpl;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-
-import static org.springframework.web.bind.annotation.RequestMethod.*;
+import javax.annotation.Resource;
 
 @Slf4j
 @RestController
 @RequestMapping("/rest")
 public class ArticleRestController {
+
+    @Resource(name = "articleRestJDBCServiceImpl")
+    ArticleRestJDBCServiceImpl articleRestJDBCService;
 
     @ApiOperation(value = "添加文章", notes = "添加新的文章", tags = "Article",httpMethod = "POST")
 
@@ -30,7 +33,7 @@ public class ArticleRestController {
     @PostMapping("/article")
     public AjaxResponse saveArticle(@RequestBody Article article) {
 
-        log.info("saveArticle：{}",article);
+        articleRestJDBCService.saveArticle(article);
         return  AjaxResponse.success(article);
     }
 
@@ -38,7 +41,7 @@ public class ArticleRestController {
     @DeleteMapping("/article/{id}")
     public AjaxResponse deleteArticle(@PathVariable Long id) {
 
-        log.info("deleteArticle：{}",id);
+        articleRestJDBCService.deleteArticle(id);
         return AjaxResponse.success(id);
     }
  
@@ -47,7 +50,7 @@ public class ArticleRestController {
     public AjaxResponse updateArticle(@PathVariable Long id, @RequestBody Article article) {
         article.setId(id);
 
-        log.info("updateArticle：{}",article);
+        articleRestJDBCService.updateArticle(article);
         return AjaxResponse.success(article);
     }
  
@@ -55,7 +58,14 @@ public class ArticleRestController {
     @GetMapping("/article/{id}")
     public AjaxResponse getArticle(@PathVariable Long id) {
 
-        Article article1 = Article.builder().id(1L).author("zimug").content("spring boot 2.深入浅出").createTime(new Date()).title("t1").build();
-        return AjaxResponse.success(article1);
+
+        return AjaxResponse.success(articleRestJDBCService.getArticle(id));
+    }
+
+    @GetMapping("/article")
+    public AjaxResponse getAllArticle() {
+
+
+        return AjaxResponse.success(articleRestJDBCService.getAll());
     }
 }
